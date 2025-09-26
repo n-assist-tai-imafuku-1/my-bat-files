@@ -1,19 +1,19 @@
 @echo off
 echo ==============================================
-echo   WIM ã‚¤ãƒ¡ãƒ¼ã‚¸å¾©å…ƒãƒãƒƒãƒé–‹å§‹
+echo   WIM ƒCƒ[ƒW•œŒ³ƒoƒbƒ`ŠJn
 echo ==============================================
 
-:: ===== ãƒ¦ãƒ¼ã‚¶ãƒ¼ç¢ºèª =====
-set /p CONFIRM="è­¦å‘Š: ã“ã®æ“ä½œã‚’å®Ÿè¡Œã™ã‚‹ã¨ãƒ‡ã‚£ã‚¹ã‚¯ã®å†…å®¹ãŒã™ã¹ã¦æ¶ˆå»ã•ã‚Œã¾ã™ã€‚æœ¬å½“ã«ç¶šè¡Œã—ã¾ã™ã‹ï¼Ÿ (Y/N): "
+:: ===== ƒ†[ƒU[Šm”F =====
+set /p CONFIRM="Œx: ‚±‚Ì‘€ì‚ğÀs‚·‚é‚ÆƒfƒBƒXƒN‚Ì“à—e‚ª‚·‚×‚ÄÁ‹‚³‚ê‚Ü‚·B–{“–‚É‘±s‚µ‚Ü‚·‚©H (Y/N): "
 if /i not "%CONFIRM%"=="Y" (
-    echo æ“ä½œã‚’ä¸­æ­¢ã—ã¾ã—ãŸã€‚
+    echo ‘€ì‚ğ’†~‚µ‚Ü‚µ‚½B
     pause
     exit /b
 )
 
-:: ===== ãƒ‡ã‚£ã‚¹ã‚¯åˆæœŸåŒ– =====
+:: ===== ƒfƒBƒXƒN‰Šú‰» =====
 echo.
-echo --- DiskPart: ãƒ‡ã‚£ã‚¹ã‚¯åˆæœŸåŒ–ãƒ»ãƒ‘ãƒ¼ãƒ†ã‚£ã‚·ãƒ§ãƒ³ä½œæˆ ---
+echo --- DiskPart: ƒfƒBƒXƒN‰Šú‰»Eƒp[ƒeƒBƒVƒ‡ƒ“ì¬ ---
 (
 echo select disk 0
 echo clean
@@ -27,17 +27,17 @@ echo assign letter=Z
 :: MSR
 echo create partition msr size=16
 
-:: Cãƒ‰ãƒ©ã‚¤ãƒ– (Windows 464GB)
+:: Cƒhƒ‰ƒCƒu (Windows 464GB)
 echo create partition primary size=475873
 echo format fs=ntfs quick label="Windows"
 echo assign letter=C
 
-:: Dãƒ‰ãƒ©ã‚¤ãƒ– (ãƒœãƒªãƒ¥ãƒ¼ãƒ  9.99GB)
+:: Dƒhƒ‰ƒCƒu (ƒ{ƒŠƒ…[ƒ€ 9.99GB)
 echo create partition primary size=10240
 echo format fs=ntfs quick label="Volume"
 echo assign letter=D
 
-:: å›å¾©ãƒ‘ãƒ¼ãƒ†ã‚£ã‚·ãƒ§ãƒ³ (WinRE_DRV)
+:: ‰ñ•œƒp[ƒeƒBƒVƒ‡ƒ“ (WinRE_DRV)
 echo create partition primary 
 echo format fs=ntfs quick label="WinRE_DRV"
 echo set id=de94bba4-06d1-4d40-a16a-bfd50179d6ac
@@ -47,42 +47,44 @@ echo assign letter=R
 diskpart /s diskpart_script.txt
 del diskpart_script.txt
 
-:: ===== WIMãƒ•ã‚¡ã‚¤ãƒ«ã‚’è‡ªå‹•æ¤œå‡º =====
+:: ===== ƒ†[ƒU[‚É WIMƒtƒ@ƒCƒ‹–¼‚ğ“ü—Í‚³‚¹‚é =====
+set /p WIMFILE=g—p‚·‚éWIMƒtƒ@ƒCƒ‹–¼‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢i—áFMyBackup.wimj: 
+
 echo.
-echo --- WIMãƒ•ã‚¡ã‚¤ãƒ«æ¤œç´¢ä¸­ ---
-set WIMPATH=
+echo --- images ƒtƒHƒ‹ƒ_“à‚Ì %WIMFILE% ‚ğŒŸõ’† ---
+
+set "WIMPATH="
+
 for %%d in (D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
-    if exist "%%d:\MasterPC.wim" (
-        set WIMPATH=%%d:\MasterPC.wim
-        goto found
+    if exist "%%d:\images\%WIMFILE%" (
+        set "WIMPATH=%%d:\images\%WIMFILE%"
+        goto :found
     )
 )
 
 :found
-if "%WIMPATH%"=="" (
-    echo MasterPC.wim ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚
-    echo USBã¾ãŸã¯å¤–ä»˜ã‘HDDã« MasterPC.wim ã‚’é…ç½®ã—ã¦ãã ã•ã„ã€‚
-    pause
-    exit /b
+if defined WIMPATH (
+    echo ŒŸo‚³‚ê‚½ WIMƒtƒ@ƒCƒ‹: %WIMPATH%
+) else (
+    echo WIMƒtƒ@ƒCƒ‹u%WIMFILE%v‚Í images ƒtƒHƒ‹ƒ_“à‚ÉŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B
 )
 
-echo ä½¿ç”¨ã™ã‚‹WIM: %WIMPATH%
 
-:: ===== WIMå±•é–‹ =====
+:: ===== WIM“WŠJ =====
 echo.
-echo --- DISM: WIM ã‚¤ãƒ¡ãƒ¼ã‚¸å±•é–‹ ---
+echo --- DISM: WIM ƒCƒ[ƒW“WŠJ ---
 dism /apply-image /imagefile:%WIMPATH% /index:1 /applydir:Z:\
 dism /apply-image /imagefile:%WIMPATH% /index:2 /applydir:C:\
 dism /apply-image /imagefile:%WIMPATH% /index:3 /applydir:D:\
 dism /apply-image /imagefile:%WIMPATH% /index:4 /applydir:R:\
 
-:: ===== ãƒ–ãƒ¼ãƒˆæ§‹æˆä½œæˆ =====
+:: ===== ƒu[ƒg\¬ì¬ =====
 echo.
-echo --- BCDboot: ãƒ–ãƒ¼ãƒˆæ§‹æˆä½œæˆ ---
+echo --- BCDboot: ƒu[ƒg\¬ì¬ ---
 bcdboot C:\Windows /s Z: /f UEFI
 
 echo.
 echo ==============================================
-echo   å¾©å…ƒå®Œäº†ï¼PCã‚’å†èµ·å‹•ã—ã¦ãã ã•ã„
+echo   •œŒ³Š®—¹IPC‚ğÄ‹N“®‚µ‚Ä‚­‚¾‚³‚¢
 echo ==============================================
 pause
