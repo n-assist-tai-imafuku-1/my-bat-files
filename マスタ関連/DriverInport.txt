@@ -1,0 +1,1 @@
+for /r "F:\DriverBackup" %f in (*.inf) do pnputil /add-driver "%f" /install
