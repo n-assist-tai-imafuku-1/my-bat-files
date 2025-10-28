@@ -1,4 +1,5 @@
 @echo off
+
 echo ==============================================
 echo   WIM イメージ復元バッチ開始
 echo ==============================================
@@ -32,10 +33,6 @@ echo create partition primary size=475873
 echo format fs=ntfs quick label="Windows"
 echo assign letter=C
 
-:: Dドライブ (ボリューム 9.99GB)
-echo create partition primary size=10240
-echo format fs=ntfs quick label="Volume"
-echo assign letter=D
 
 :: 回復パーティション (WinRE_DRV)
 echo create partition primary 
@@ -47,34 +44,35 @@ echo assign letter=R
 diskpart /s diskpart_script.txt
 del diskpart_script.txt
 
-:: ===== WIMファイルを自動検出 =====
+:: ===== ユーザーに WIMファイル名を入力させる =====
+set /p WIMFILE=使用するWIMファイル名を入力してください（例：MyBackup.wim）: 
+
 echo.
-echo --- WIMファイル検索中 ---
-set WIMPATH=
+echo --- images フォルダ内の %WIMFILE% を検索中 ---
+
+set "WIMPATH="
+
 for %%d in (D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
-    if exist "%%d:\MasterPC.wim" (
-        set WIMPATH=%%d:\MasterPC.wim
-        goto found
+    if exist "%%d:\images\%WIMFILE%" (
+        set "WIMPATH=%%d:\images\%WIMFILE%"
+        goto :found
     )
 )
 
 :found
-if "%WIMPATH%"=="" (
-    echo MasterPC.wim が見つかりませんでした。
-    echo USBまたは外付けHDDに MasterPC.wim を配置してください。
-    pause
-    exit /b
+if defined WIMPATH (
+    echo 検出された WIMファイル: %WIMPATH%
+) else (
+    echo WIMファイル「%WIMFILE%」は images フォルダ内に見つかりませんでした。
 )
 
-echo 使用するWIM: %WIMPATH%
 
 :: ===== WIM展開 =====
 echo.
 echo --- DISM: WIM イメージ展開 ---
 dism /apply-image /imagefile:%WIMPATH% /index:1 /applydir:Z:\
 dism /apply-image /imagefile:%WIMPATH% /index:2 /applydir:C:\
-dism /apply-image /imagefile:%WIMPATH% /index:3 /applydir:D:\
-dism /apply-image /imagefile:%WIMPATH% /index:4 /applydir:R:\
+dism /apply-image /imagefile:%WIMPATH% /index:3 /applydir:R:\
 
 :: ===== ブート構成作成 =====
 echo.
